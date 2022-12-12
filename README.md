@@ -1,4 +1,4 @@
-# 얼굴 감정 인식 프로젝트
+# 얼굴  인식 프로젝트
 
 ------------------------
 
@@ -18,8 +18,9 @@
 ------------------------
 
 ### 과제요약
-처음에는 퍼스널 컬러에 대해 연구하다가 자료 부족과 완성하기까지의 퀄리티가
-부족하다 판단하여 사람의 감정을 얼굴로 인식할 수 있는 기술을 구현해보았다.
+처음에는 퍼스널 컬러에 대한 연구를 진행하다가 자료부족과 우리들의 기술적인 역량 문제로
+시간안에 해결하지 못할 것으로 생각하여 사람의 얼굴 특정값과 오픈소스를 활용해 보다 더 간단하면서도
+쉽게 접근할 수 있는 얼굴 감정 인식을 연구해보기로 했다.
 
 ------------------------
 
@@ -32,8 +33,89 @@
 
 ------------------------
 
+### 코드 요약
+1. index.html
+<pre>
+<code>
+<title>Document</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      width: 100vw;
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    canvas {
+      position: absolute;
+    }
+  </style>
+</code>
+</pre>
+웹 서버를 통해 쉽게 접근하면서 출력되는 사이즈를 html언어로 활용해 조절하였고
+<pre>
+<code>
+<script defer src="face-api.min.js"></script>
+  <script defer src="script.js"></script>
+</code>
+</pre>
+실행 가능한 코드들을 포함시켰다.
+
+2. javascript
+<pre>
+<code>
+Promise.all([
+  faceapi.nets.tinyFaceDetector.loadFromUri('/models'),
+  faceapi.nets.faceLandmark68Net.loadFromUri('/models'),
+  faceapi.nets.faceRecognitionNet.loadFromUri('/models'),
+  faceapi.nets.faceExpressionNet.loadFromUri('/models')
+]).then(startVideo)
+</code>
+</pre>
+얼굴에서 알고 싶은 것을 결정하고 사용 가능한 모델들을 사용하여 원하는 기술을 구현하게끔 만듬
+<pre>
+<code>
+video.addEventListener('play', () => {
+  const canvas = faceapi.createCanvasFromMedia(video)
+  document.body.append(canvas)
+  const displaySize = { width: video.width, height: video.height }
+  faceapi.matchDimensions(canvas, displaySize)
+</code>
+</pre>
+faceapi로 추출할 거를 비디오로 연결하고 캔버스를 만들어 거기에 출력되게 만들고
+출력크기를 조절하였다.
+<pre>
+<code>
+setInterval(async () => {
+    const detections = await faceapi.detectAllFaces(video, new faceapi.TinyFaceDetectorOptions()).withFaceLandmarks().withFaceExpressions()
+    const resizedDetections = faceapi.resizeResults(detections, displaySize)
+    canvas.getContext('2d').clearRect(0, 0, canvas.width, canvas.height)
+    faceapi.draw.drawDetections(canvas, resizedDetections)
+</code>
+</pre>
+face.api를 이용해서 얼굴을 인식하게 만들었다 여기서 우리가 구현할려는 기술의 핵심 코드가 있는데
+<pre>
+<code>
+faceapi.draw.drawFaceLandmarks(canvas, resizedDetections)
+    faceapi.draw.drawFaceExpressions(canvas, resizedDetections)
+  }, 100)
+</code>
+</pre>
+face.api로 68개의 포인트를 감지하는 얼굴 랜드마크를 계산하고
+인식된 얼굴 표정을 인식해주는 api와 연결하여 원하는 결과를 이끌어냈다.
+
+-----------------------
+
 ### 예상결과
-사람의 얼굴이 인식되고 얼굴의 특정한 표정 값에 따라 사람의 감정이 화면에 출력될 것이다.
+사람의 얼굴이 인식되고 그 인식된 얼굴의 표정을 읽고 무슨 감정인지 출력된다.
+
+
+
+https://user-images.githubusercontent.com/62829568/206907514-7d75b64f-8e42-42c5-94bc-f39c4532e4c8.mp4
+
+
 
 ------------------------
 
@@ -56,24 +138,24 @@
 활용하기 좋은 주제가 뭔지에 대해 초점을 두고 의논해봤는데,
 팀장의 주제가 가장 잘 부합하다고 결론이 나왔다.
 
-2022년 12월 7일 회의록
-지영수: 우리가 지금 하고있는 주제는 너무 심화과정이라 다른 주제로 바꿔서 보다 쉬우면서 
-사람들이 쉽게 접근할 수 있는 기술을 만들어보는게 좋을 것 같다 생각.
+2022년 11월 25일 회의록
+지영수: 퍼스널 컬러말고 조금 더 가볍게 접근해서 연구를 진행해보자
 
-이예준: 퍼스널 컬러를 추출하는 과정이 기본 얼굴 인식과는 다른 기술들도 많고 자료도 많이 부족하여
-남은 일정동안 구현하기 까지는 차질이 있다 생각했다.
-그래서 일정 동안에라도 구현이 가능하면서 인식하는 기술의 요점은 잘 드러낼 수 있는 주제를 선정하면 좋지 않을까 생각
+이예준: 생각보다 주제가 어렵고 자료도 부족해서 연구가 어려웠다.
+쉽게 응용하기 좋은 오픈소스들을 활용해 기술을 구현해보는 건 어떨까?
 
 이시원: 모두의 의견에 공감했고 주제를 바꿔서 좀 더 우리가 잘 할수 있는걸로 변경하는 것이 좋다 생각
 
 ------------------------
 
 ### 소감문
-이예준: 처음에 퍼스널 컬러라는 주제로 팀원들과 열심히 연구를 진행해 보았지만 자료부족과 우리들의 역량이
-부족하다 생각하여 가벼우면서도 사람들이 재밌게 활용 가능한 동물 인식으로 주제를 변경하면서
-전에 연구는 뭐가 부족했는지 알아서 그런지 더 잘 될꺼라는 생각이 들었다.
+이예준: 처음에 퍼스널 컬러라는 주제로 팀원들과 열심히 연구를 해봤지만 당장은 주어진 시간과 우리들의 역량으로는 구현하기
+힘들다 생각이 들어 얼굴 인식 기술의 정수에 더 가까우면서 쉽게 활용하고 접근하기 좋은 기술 중에 뭐가 있을까
+생각해보다가 팀원들끼리의 회의 끝에 얼굴 표정 인식 연구를 시작하게 됐습니다.
+오픈소스를 활용해 사람의 표정에서 나오는 특수한 값을 이용해 표정을 읽어 출력하게 되는 연구를 진행하게 됐는데,
+이 얼굴인식이 정말 다양하게 일상생활에서 쓰일 수 있겠구나라는 생각이 들었고 앞으로 이 수업 말고도 더 연구해보고 싶은 생각이 들었다.
 
-지영수: 처음 팀프로젝트를 구상할 때, 퍼스널컬러를 찾아주는 프로그램을 구현해보기로 했지만, 퍼스널컬러의 유래가 우리나라에서 나왔고 비교적 최근의 주제라 자료가 많이 없어 부득이하게 주제를 고양이 얼굴 찾기로 바꾸게 되었습니다. 저는 팀프로젝트 초반 회의에서도 사람의 얼굴이 아닌 색다르게 동물의 얼굴을 인식하는 것은 어떤가 의견을 냈어서 이번 고양이 얼굴 인식은 더욱 열심히 자료 조사를 했던 것 같습니다. 퍼스널 컬러라는 좋은 주제를 놓친것이 아쉽지만, 고양이 얼굴을 인식하는 좋은 오픈 소스가 있어 재밌게 팀프로젝트를 마쳤습니다. 비록 이번에는 능력이 부족하여 퍼스널 컬러를 포기했지만 다음 또 팀프로젝트가 있다면 다시 한번 도전하여 구현해보고 싶습니다.
+지영수: 처음 팀프로젝트를 구상할 때, 퍼스널컬러를 찾아주는 프로그램을 구현해보기로 했지만, 퍼스널컬러의 유래가 우리나라에서 나왔고 비교적 최근의 주제라 자료가 많이 없어 부득이하게 주제를 얼굴을 인식하여 감정읽기로 바꾸게 되었습니다. 처음 골랐던 주제가 무산되어 시간이 촉박해 정신없이 자료 조사를 했던 것 같습니다. 퍼스널 컬러라는 좋은 주제를 놓친것이 아쉽지만, 사람의 감정을 표정으로 읽어내는 좋은 오픈 소스가 있어 재밌게 팀프로젝트를 마쳤습니다. 비록 이번에는 능력이 부족하여 퍼스널 컬러를 포기했지만 다음 또 팀프로젝트가 있다면 다시 한번 도전하여 구현해보고 싶습니다.
 
 이시원: 처음에는 우리가 얼굴인식과 퍼스널 컬러 선정이라는 
 두 가지 기술을 함께 구현할수 있을까 라는 생각이 많이 들었습니다. 
