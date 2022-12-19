@@ -161,3 +161,10 @@ https://user-images.githubusercontent.com/62829568/206907514-7d75b64f-8e42-42c5-
 두 가지 기술을 함께 구현할수 있을까 라는 생각이 많이 들었습니다. 
 하지만 적극적이고 항상 우리에게 도움을 주려하시는 교수님, 
 그리고 훌륭한 실력을 가진 팀원과 함께한다면 충분히 할수 있을 것이라는 생각이 들었다.
+
+-------------------------
+
+### 리플릿
+![KakaoTalk_20221212_160220427_01](https://user-images.githubusercontent.com/62829568/208410448-d8be2935-077d-4354-a5aa-144f5796a99d.png)
+![KakaoTalk_20221212_160220427](https://user-images.githubusercontent.com/62829568/208410463-94851745-61d5-4cc5-9078-6a3e91dc3417.png)
+
